@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang@sha256:0991060a1447cf648bab7f6bb60335d1243930e38420bee8fec3db1267b84cfa as builder
 ENV GO111MODULE=on
 RUN apk update && apk add --no-cache git ca-certificates tzdata && update-ca-certificates
 ENV USER=appuser
@@ -16,7 +16,6 @@ COPY . .
 RUN go mod vendor
 RUN ls
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /go/bin/hello -mod vendor main.go
-
 
 FROM scratch
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
