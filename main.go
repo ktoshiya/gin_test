@@ -1,24 +1,25 @@
 package main
 
 import (
+	controllers "gin_test/controllers"
+	"gin_test/models"
 	"github.com/gin-gonic/gin"
-
-	"net/http"
 )
 
 func main() {
-    engine:= gin.Default()
-	ua := ""
+	r := gin.Default()
 
-	engine.Use(func(c *gin.Context) {
-		ua = c.GetHeader("User-Agent")
+	db := models.SetupModels()
+
+	r.Use(func(c *gin.Context){
+		c.Set("db", db)
 		c.Next()
 	})
-    engine.GET("/", func(c *gin.Context) {
-        c.JSON(http.StatusOK, gin.H{
-            "message": "hello world",
-			"User-Agent": ua,
-        })
-    })
-    engine.Run(":3000")
+
+	r.GET("/books", controllers.FindBooks)
+	r.POST("/books", controllers.CreateBook)
+	r.GET("/books/:id", controllers.FindBook)
+	r.PATCH("/books/:id", controllers.UpdateBook)
+	r.DELETE("/books/:id", controllers.DeleteBook)
+	r.Run()
 }
